@@ -50,8 +50,7 @@ try{
     const {error:e}=await cliente.auth.setSession({access_token:fragment.get('access_token'),refresh_token:fragment.get('refresh_token')});
     if(e)throw e;
   }else if(tieneCodigo){
-    const {error:e}=await cliente.auth.exchangeCodeForSession(query.get('code'));
-    if(e)throw e;
+    throw new Error('El enlace se generó con un flujo PKCE que no puede completarse en este navegador. Solicitá uno nuevo desde la versión corregida de TrumpeX.');
   }else{
     throw new Error('Falta una sesión de recuperación válida.');
   }
@@ -78,7 +77,7 @@ try{
       await cliente.auth.signOut({scope:'local'});
     }catch(e){estado.textContent='No se pudo actualizar la contraseña. El enlace puede haber vencido. Solicitá otro desde TrumpeX.';estado.className='status error';boton.disabled=false}
   });
-}catch(e){history.replaceState(null,'',location.pathname);mostrarError('El enlace no pudo verificarse o ya venció. Solicitá uno nuevo desde TrumpeX.')}
+}catch(e){history.replaceState(null,'',location.pathname);mostrarError(e?.message?.includes('PKCE') ? e.message : 'El enlace no pudo verificarse o ya venció. Solicitá uno nuevo desde TrumpeX.')}
 })();
 </script>
 </body>
